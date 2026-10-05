@@ -2,6 +2,12 @@
 
 Calm Douyin is a Chrome extension for www.douyin.com. It replaces Douyin's interface with a quiet one of its own, and it removes low-quality videos before they load.
 
+## Demo
+
+[![Calm Douyin demo video](demo/poster.jpg)](demo/calm-douyin-demo.mp4)
+
+Click the picture to open the video (62 seconds, with sound). The video shows the home grid, the topic filter, the "不感兴趣" menu, the filtered list, the plain player and the learning settings. The learned tags in the settings scene are sample data.
+
 ## What it does
 
 - **Own interface.** Douyin's side navigation, header, promotions and grid do not show. You get a top bar (精选, 推荐, 关注, search, profile) and a home grid in the style of an ordinary video site. The text is Chinese. The interface follows the light or dark setting of the system. There are no like counts.
