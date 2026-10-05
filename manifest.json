@@ -1,0 +1,68 @@
+{
+  "manifest_version": 3,
+  "name": "Calm Douyin",
+  "version": "2.1.0",
+  "description": "安静的抖音。自己的首页，并过滤 AI 生成视频、影视解说、短剧引流、广告和直播。",
+  "minimum_chrome_version": "114",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "*://www.douyin.com/*"
+  ],
+  "background": {
+    "service_worker": "src/background.js"
+  },
+  "action": {
+    "default_title": "Calm Douyin",
+    "default_popup": "src/popup/popup.html",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://www.douyin.com/*"
+      ],
+      "js": [
+        "src/shared/settings.js",
+        "src/shared/classifier.js",
+        "src/page/interceptor.js"
+      ],
+      "run_at": "document_start",
+      "world": "MAIN"
+    },
+    {
+      "matches": [
+        "*://www.douyin.com/*"
+      ],
+      "js": [
+        "src/content/boot.js"
+      ],
+      "css": [
+        "src/content/theme.css"
+      ],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "src/shared/*.js",
+        "src/content/*.js",
+        "src/content/app.css"
+      ],
+      "matches": [
+        "*://www.douyin.com/*"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,220 @@
+/*
+ * Page-level styles for www.douyin.com, injected at document_start.
+ * Every rule is gated by a class that the content script sets on <html>:
+ *   calm-ui      the Calm interface replaces Douyin's navigation and header
+ *   calm-home    the Calm home gallery covers Douyin's 精选 grid
+ *   calm-danmaku bullet comments show (off by default)
+ *   calm-hide-counts
+ * The Calm interface itself lives in a shadow root (app.css). This file only
+ * takes Douyin's own chrome away and quiets the native player.
+ * Selectors use stable hooks only: ids, data-e2e attributes and semantic
+ * class names. Douyin's hashed class names change every release.
+ *
+ * No rule here may hide an element that can hold a player. Live rooms, for
+ * example, are links to live.douyin.com that wrap a whole slide.
+ */
+
+:root {
+  --calm-bg: #000;
+  --calm-ease: cubic-bezier(0.22, 0.8, 0.24, 1);
+  --calm-font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+  --calm-bar: 56px; /* same height as Douyin's header, so its layout math holds */
+}
+
+/* ---------- Canvas ---------- */
+
+/* Name each element. Douyin puts full-screen portals (private messages) in
+   #root, over the page. A background on one of them hides the whole page. */
+html.calm-ui,
+html.calm-ui body,
+html.calm-ui div:has(> #douyin-right-container),
+html.calm-ui #douyin-right-container,
+html.calm-ui .route-scroll-container {
+  background: var(--calm-bg) !important;
+}
+
+html.calm-ui body {
+  font-family: var(--calm-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+html.calm-ui ::selection {
+  background: rgba(185, 203, 169, 0.3);
+}
+
+html.calm-ui ::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+html.calm-ui ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+html.calm-ui ::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+/* ---------- Douyin's chrome ---------- */
+
+/* The side navigation goes away. The header keeps its box (the page layout
+   depends on its height) but is not drawn: the Calm top bar sits over it. */
+html.calm-ui #douyin-navigation {
+  display: none !important;
+}
+
+html.calm-ui #douyin-header {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+html.calm-ui #douyin-right-container {
+  margin-left: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+}
+
+/* Promotions and prompts. */
+html.calm-ui .tab-get_app,
+html.calm-ui [data-e2e="recommend-guide-mask"],
+html.calm-on .calm-gone {
+  display: none !important;
+}
+
+/* ---------- Home: Douyin's 精选 grid stays alive but out of sight ---------- */
+
+/* visibility, not display: the grid must keep its size so that Douyin's own
+   infinite loader still works when the Calm gallery asks for more. */
+html.calm-home #douyin-right-container > *:not(#douyin-header) {
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* Each hidden card takes a full row and most of a screen. The list then
+   always has room to scroll, even when the filter keeps one item per batch. */
+html.calm-home .discover-video-card-item {
+  grid-column: 1 / -1 !important;
+  min-height: 70vh !important;
+}
+
+/* The player modal lives inside that hidden subtree. Its descendants inherit
+   these two values, so one rule brings the whole player back. */
+html.calm-home [data-e2e="modal-video-container"] {
+  visibility: visible !important;
+  pointer-events: auto !important;
+}
+
+/* ---------- Native player (modal, 推荐, 关注) ---------- */
+
+/* Douyin's own close button and search box sit beside the modal container.
+   The Calm "Back" control clicks that close button, so it stays in the DOM.
+   A sibling that holds a video is a player, and it always stays. */
+html.calm-ui div:has(> [data-e2e="modal-video-container"]) > :not([data-e2e="modal-video-container"]):not(:has(video)) {
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+html.calm-ui div:has(> [data-e2e="modal-video-container"]) > :not([data-e2e="modal-video-container"]):not(:has(video)) * {
+  pointer-events: none !important;
+}
+
+html.calm-ui [data-e2e="modal-video-container"] {
+  background: var(--calm-bg) !important;
+}
+
+/* A plain player: the video, its caption, four actions and a short control
+   bar. Everything in this list is a small extra, never a player. */
+html.calm-ui:not(.calm-danmaku) .xgplayer .danmu,
+html.calm-ui:not(.calm-danmaku) [data-e2e="danmaku-container"],
+html.calm-ui [data-e2e="chapter-container"],
+html.calm-ui xg-icon.xgplayer-pip,
+html.calm-ui xg-icon.xgplayer-watch-later,
+html.calm-ui xg-icon.xgplayer-playclarity-setting,
+html.calm-ui xg-icon.xgplayer-immersive-switch-setting,
+html.calm-ui xg-icon.xgplayer-autoplay-setting,
+html.calm-ui xg-icon.xgplayer-page-full-screen,
+html.calm-ui xg-icon.xgplayer-shot,
+html.calm-ui xg-icon.xgplayer-texttrack,
+html.calm-ui .ai-douyin-entry,
+html.calm-ui .immersive-player-switch-on-hide-interaction-area div:has(> [data-e2e="video-avatar"]),
+html.calm-ui [data-e2e="video-avatar"],
+html.calm-ui [data-e2e="feed-follow-icon"],
+html.calm-ui [data-e2e="video-play-more"],
+html.calm-ui [data-e2e="video-info"] .video-create-time,
+/* Series bar, "identify the picture", related search, shopping link. */
+html.calm-ui [data-e2e="video-info"] > div > :not(.account):not([data-e2e="video-desc"]) {
+  display: none !important;
+}
+
+/* Like / comment / save / share column: quiet until the pointer comes near. */
+html.calm-ui .immersive-player-switch-on-hide-interaction-area {
+  opacity: 0.4;
+  transition: opacity 0.5s var(--calm-ease);
+}
+
+html.calm-ui .immersive-player-switch-on-hide-interaction-area:hover {
+  opacity: 1;
+}
+
+html.calm-ui [data-e2e="video-player-digg"],
+html.calm-ui [data-e2e="feed-comment-icon"],
+html.calm-ui [data-e2e="video-player-collect"],
+html.calm-ui [data-e2e="video-player-share"] {
+  transition: transform 0.35s var(--calm-ease);
+}
+
+html.calm-ui [data-e2e="video-player-digg"]:active,
+html.calm-ui [data-e2e="video-player-collect"]:active {
+  transform: scale(0.88);
+}
+
+/* Control bar: only the progress line shows until hover. */
+html.calm-ui .xgplayer xg-controls {
+  opacity: 0.3;
+  transition: opacity 0.45s var(--calm-ease);
+}
+
+html.calm-ui .xgplayer:hover xg-controls,
+html.calm-ui .xgplayer.xgplayer-pause xg-controls {
+  opacity: 1;
+}
+
+/* Caption block. */
+html.calm-ui .player-position-box-bottom {
+  font-family: var(--calm-font);
+  opacity: 0.8;
+  transition: opacity 0.45s var(--calm-ease);
+}
+
+html.calm-ui .player-position-box-bottom:hover {
+  opacity: 1;
+}
+
+html.calm-ui [data-e2e="video-desc"] {
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+html.calm-ui [data-e2e="video-switch-prev-arrow"],
+html.calm-ui [data-e2e="video-switch-next-arrow"] {
+  opacity: 0.4;
+  transition: opacity 0.4s var(--calm-ease);
+}
+
+html.calm-ui [data-e2e="video-switch-prev-arrow"]:hover,
+html.calm-ui [data-e2e="video-switch-next-arrow"]:hover {
+  opacity: 1;
+}
+
+/* Detail page player (/video/…). */
+html.calm-ui .xgplayer:not(.modalPlayer):not(.xgplayer-is-fullscreen):not(:fullscreen) {
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+/* ---------- Counts ---------- */
+
+html.calm-hide-counts .calm-count {
+  visibility: hidden !important;
+}

@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Calm Douyin</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">
+      <img src="../../icons/icon-48.png" alt="" width="28" height="28">
+      <div>
+        <h1>Calm Douyin</h1>
+        <p class="sub" id="status-line">过滤已开启</p>
+      </div>
+    </div>
+    <label class="switch big" title="开启或关闭 Calm Douyin">
+      <input type="checkbox" data-path="enabled">
+      <span></span>
+    </label>
+  </header>
+
+  <main id="body">
+    <section class="today" aria-label="今天">
+      <div class="today-main">
+        <div class="metric">
+          <span class="metric-num" id="hidden-count">0</span>
+          <span class="metric-label">今日已过滤</span>
+        </div>
+        <div class="metric right">
+          <span class="metric-num small" id="seen-count">0</span>
+          <span class="metric-label">已检查</span>
+        </div>
+      </div>
+      <div class="bar"><span id="bar-fill"></span></div>
+      <div class="reason-chips" id="reason-chips"></div>
+      <p class="watch" id="watch-line"></p>
+    </section>
+
+    <details open>
+      <summary>过滤内容</summary>
+      <div class="rows">
+        <label class="row"><span><b>AI 生成</b><i>AIGC 视频、AI 短剧、数字人</i></span><span class="switch"><input type="checkbox" data-path="filters.ai"><span></span></span></label>
+        <label class="row"><span><b>解说和混剪</b><i>影视解说号、混剪、二创</i></span><span class="switch"><input type="checkbox" data-path="filters.recap"><span></span></span></label>
+        <label class="row"><span><b>短剧</b><i>连载短剧和漫剧引流</i></span><span class="switch"><input type="checkbox" data-path="filters.drama"><span></span></span></label>
+        <label class="row"><span><b>摆拍演绎</b><i>作者声明为虚构演绎的剧本内容</i></span><span class="switch"><input type="checkbox" data-path="filters.staged"><span></span></span></label>
+        <label class="row"><span><b>广告</b><i>信息流里的推广内容</i></span><span class="switch"><input type="checkbox" data-path="filters.ads"><span></span></span></label>
+        <label class="row"><span><b>直播</b><i>混在信息流里的直播间</i></span><span class="switch"><input type="checkbox" data-path="filters.live"><span></span></span></label>
+        <label class="row"><span><b>带货</b><i>商品链接、团购、带货</i></span><span class="switch"><input type="checkbox" data-path="filters.commerce"><span></span></span></label>
+        <label class="row"><span><b>标题党</b><i>引流文案和话题标签堆砌</i></span><span class="switch"><input type="checkbox" data-path="filters.clickbait"><span></span></span></label>
+        <label class="row"><span><b>图文</b><i>图片帖子，不是视频</i></span><span class="switch"><input type="checkbox" data-path="filters.images"><span></span></span></label>
+      </div>
+    </details>
+
+    <details open>
+      <summary>严格程度</summary>
+      <div class="pad">
+        <div class="seg" data-seg="strictness">
+          <button type="button" data-value="off">关闭</button>
+          <button type="button" data-value="relaxed">宽松</button>
+          <button type="button" data-value="balanced">均衡</button>
+          <button type="button" data-value="strict">严格</button>
+          <span class="seg-glow"></span>
+        </div>
+        <p class="hint" id="strictness-hint"></p>
+        <div class="field-label">最短时长</div>
+        <div class="seg" data-seg="minSeconds">
+          <button type="button" data-value="0">不限</button>
+          <button type="button" data-value="15">15 秒</button>
+          <button type="button" data-value="30">30 秒</button>
+          <button type="button" data-value="60">1 分钟</button>
+          <span class="seg-glow"></span>
+        </div>
+      </div>
+    </details>
+
+    <details>
+      <summary>专注模式</summary>
+      <div class="pad">
+        <label class="row flat"><span><b>只看我的话题</b><i>只保留文案、话题标签或分类与话题相符的视频</i></span><span class="switch"><input type="checkbox" data-path="focusMode"><span></span></span></label>
+        <div class="chips" data-list="focusTopics" data-placeholder="输入话题，按回车添加"></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>屏蔽和放行</summary>
+      <div class="pad">
+        <div class="field-label">屏蔽词</div>
+        <div class="chips" data-list="blockedWords" data-placeholder="文案、话题标签或分类里的词"></div>
+        <div class="field-label">屏蔽的作者</div>
+        <div class="chips" data-list="blockedCreators" data-placeholder="昵称或抖音号"></div>
+        <div class="field-label">屏蔽的标签</div>
+        <div class="chips" data-list="blockedTags" data-placeholder="话题标签，不用写 #"></div>
+        <div class="field-label">隐藏的话题</div>
+        <div class="chips" data-list="blockedCategories" data-placeholder="抖音分类，例如 电影剧情解说"></div>
+        <div class="field-label">始终放行的作者</div>
+        <div class="chips" data-list="trustedCreators" data-placeholder="昵称或抖音号"></div>
+      </div>
+    </details>
+
+    <details>
+      <summary>自动学习</summary>
+      <div class="pad">
+        <label class="row flat"><span><b>根据观看习惯学习</b><i>你很快划走的视频，或点了「减少这类视频」的视频，它们的标签、话题和词会被记下来。同类多次出现后自动过滤。看完或点赞的不会被过滤。</i></span><span class="switch"><input type="checkbox" data-path="learn.enabled"><span></span></span></label>
+        <div class="field-label">学到的标签</div>
+        <div class="chips" data-list="learn.tags" data-placeholder="还没有。也可以自己添加"></div>
+        <div class="field-label">学到的话题</div>
+        <div class="chips" data-list="learn.categories" data-placeholder="还没有。也可以自己添加"></div>
+        <div class="field-label">学到的词</div>
+        <div class="chips" data-list="learn.words" data-placeholder="还没有。也可以自己添加"></div>
+        <p class="hint">删除一项后，它不会再被学到。</p>
+        <button type="button" id="forget" class="link">清除学习记录</button>
+      </div>
+    </details>
+
+    <details>
+      <summary>界面</summary>
+      <div class="rows">
+        <label class="row"><span><b>Calm 界面</b><i>自己的首页和顶栏。关闭后回到原版抖音。</i></span><span class="switch"><input type="checkbox" data-path="ui.calmTheme"><span></span></span></label>
+        <label class="row"><span><b>隐藏点赞数</b><i>看视频本身，不看数字</i></span><span class="switch"><input type="checkbox" data-path="ui.hideCounts"><span></span></span></label>
+        <label class="row"><span><b>显示弹幕</b><i>视频上飘过的评论和弹幕输入框</i></span><span class="switch"><input type="checkbox" data-path="ui.danmaku"><span></span></span></label>
+        <label class="row"><span><b>播放器自动跳过</b><i>遇到被过滤的视频立刻跳过</i></span><span class="switch"><input type="checkbox" data-path="ui.autoSkip"><span></span></span></label>
+      </div>
+    </details>
+
+    <details>
+      <summary>休息提醒</summary>
+      <div class="pad">
+        <p class="hint first">一天内观看达到这个时长后，显示休息页面。</p>
+        <div class="seg" data-seg="breakMinutes">
+          <button type="button" data-value="0">关闭</button>
+          <button type="button" data-value="20">20 分钟</button>
+          <button type="button" data-value="40">40 分钟</button>
+          <button type="button" data-value="60">60 分钟</button>
+          <span class="seg-glow"></span>
+        </div>
+      </div>
+    </details>
+  </main>
+
+  <footer class="foot">
+    <span>修改对之后加载的视频生效。</span>
+    <button type="button" id="reload" class="link">刷新抖音</button>
+  </footer>
+
+  <script src="../shared/settings.js"></script>
+  <script src="../shared/classifier.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
