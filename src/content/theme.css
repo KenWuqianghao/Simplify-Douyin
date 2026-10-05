@@ -125,7 +125,7 @@ html.calm-ui [data-e2e="modal-video-container"] {
 
 /* A plain player: the video, its caption, four actions and a short control
    bar. Everything in this list is a small extra, never a player. */
-html.calm-ui:not(.calm-danmaku) .xgplayer .danmu,
+html.calm-ui:not(.calm-danmaku) .danmu,
 html.calm-ui:not(.calm-danmaku) [data-e2e="danmaku-container"],
 html.calm-ui [data-e2e="chapter-container"],
 html.calm-ui xg-icon.xgplayer-pip,
