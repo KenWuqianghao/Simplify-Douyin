@@ -4,9 +4,9 @@ Calm Douyin is a Chrome extension for www.douyin.com. It replaces Douyin's inter
 
 ## Demo
 
-[![Calm Douyin demo video](demo/poster.jpg)](demo/calm-douyin-demo.mp4)
+<a href="demo/calm-douyin-demo.mp4"><img src="demo/poster.jpg" alt="Calm Douyin demo video" width="320"></a>
 
-Click the picture to open the video (62 seconds, with sound). The video shows the home grid, the topic filter, the "不感兴趣" menu, the filtered list, the plain player and the learning settings. The learned tags in the settings scene are sample data.
+Click the picture to open the video (61 seconds, portrait, Chinese narration). The video shows the home grid, the topic filter, the filtered list, the plain player, the "不感兴趣" menu and the learning settings. The learned tags in the settings scene are sample data.
 
 ## What it does
 

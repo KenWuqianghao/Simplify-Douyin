@@ -452,7 +452,7 @@ export function createApp(actions) {
       img.addEventListener('load', () => {
         // A tall cover keeps its shape. A soft copy fills the sides.
         if (img.naturalWidth < img.naturalHeight) {
-          const back = el('img', 'back');
+          const back = el('img', 'soft');
           back.alt = '';
           back.src = img.src;
           cover.prepend(back);
@@ -508,7 +508,7 @@ export function createApp(actions) {
   // The cover grows from its card to the middle of the screen while Douyin
   // opens its player behind it. Then it fades and the video is there.
   function lift(card) {
-    const img = card.querySelector('.cover img.ready:not(.back)');
+    const img = card.querySelector('.cover img.ready:not(.soft)');
     if (!img || still()) return;
     dropStage(true);
     const from = img.getBoundingClientRect();
