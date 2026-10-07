@@ -11,6 +11,7 @@ const ICONS = {
   back: 'M15 5l-7 7 7 7',
   hide: 'M4 4l16 16M9.9 5.2A9.6 9.6 0 0 1 12 5c5 0 8.5 4.4 9.5 7a12 12 0 0 1-2.6 3.8M6.3 6.6A12.4 12.4 0 0 0 2.5 12c1 2.6 4.5 7 9.5 7a9 9 0 0 0 4-.9',
   search: 'M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14Zm9 2-4-4',
+  play: 'M8 5.5v13a1 1 0 0 0 1.5.86l10.5-6.5a1 1 0 0 0 0-1.72L9.5 4.64A1 1 0 0 0 8 5.5Z',
 };
 
 const TABS = [
@@ -37,8 +38,8 @@ function icon(name) {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.setAttribute('viewBox', '0 0 24 24');
-  svg.setAttribute('fill', 'none');
-  svg.setAttribute('stroke', 'currentColor');
+  svg.setAttribute('fill', name === 'play' ? 'currentColor' : 'none');
+  svg.setAttribute('stroke', name === 'play' ? 'none' : 'currentColor');
   svg.setAttribute('stroke-width', name === 'dots' ? '2.6' : '1.6');
   svg.setAttribute('stroke-linecap', 'round');
   svg.setAttribute('stroke-linejoin', 'round');
@@ -175,11 +176,18 @@ export function createApp(actions) {
   function buildHome() {
     const home = (refs.home = el('main', 'home'));
     const wrap = el('div', 'wrap');
+    const head = el('div', 'head');
+    head.append(el('p', 'date', new Date().toLocaleDateString('zh-CN', { month: 'long', day: 'numeric', weekday: 'long' })),
+      el('h1', '', '精选'));
+    refs.hero = el('section', 'hero');
+    refs.hero.hidden = true;
     refs.topics = el('div', 'topics');
     refs.grid = el('div', 'grid');
     refs.status = el('div', 'status');
-    wrap.append(refs.topics, refs.grid, refs.status);
+    wrap.append(head, refs.hero, refs.topics, refs.grid, refs.status);
     home.append(wrap);
+    // The bar gets its hairline when content moves under it.
+    home.addEventListener('scroll', () => root.classList.toggle('scrolled', home.scrollTop > 4), { passive: true });
 
     new IntersectionObserver((entries) => {
       if (entries.some((e) => e.isIntersecting) && view.home && !view.immersive) actions.more(false);
@@ -386,7 +394,11 @@ export function createApp(actions) {
     const feed = view.feed;
     renderTopics(feed);
 
-    const list = topic ? feed.filter((i) => i.cats[0] === topic) : feed;
+    const all = topic ? feed.filter((i) => i.cats[0] === topic) : feed;
+    // The first video gets the large place at the top. The grid shows the others.
+    const first = all.length >= 4 && all[0].cover ? all[0] : null;
+    renderHero(first);
+    const list = first ? all.slice(1) : all;
     const wanted = new Set(list.map((i) => i.id));
     const gone = [...cards.keys()].filter((id) => !wanted.has(id));
     const fresh = list.filter((i) => !cards.has(i.id));
@@ -437,6 +449,42 @@ export function createApp(actions) {
       refs.status.append(ghost);
     }
     refs.status.classList.toggle('wide', !view.exhausted && !list.length);
+  }
+
+  function renderHero(item) {
+    refs.hero.hidden = !item;
+    const id = item ? item.id : '';
+    if (refs.hero.dataset.id === id) return;
+    refs.hero.dataset.id = id;
+    refs.hero.replaceChildren();
+    if (!item) return;
+    // A soft, large copy of the cover gives the panel its colour.
+    const glow = el('img', 'glow');
+    glow.alt = '';
+    glow.src = item.cover;
+    const cover = el('button', 'cover');
+    cover.setAttribute('aria-label', titleOf(item));
+    const img = el('img');
+    img.alt = '';
+    img.addEventListener('load', () => img.classList.add('ready'));
+    img.src = item.cover;
+    cover.append(img);
+    const play = () => {
+      if (shadow.activeElement) shadow.activeElement.blur();
+      lift(refs.hero);
+      actions.open(item.id);
+    };
+    cover.addEventListener('click', play);
+    const text = el('div', 'text');
+    const meta = el('p', 'who');
+    meta.append(el('span', '', item.creator));
+    if (item.ms) meta.append(el('span', '', clock(item.ms)));
+    const button = el('button', 'play');
+    button.append(icon('play'), document.createTextNode('播放'));
+    button.addEventListener('click', play);
+    text.append(el('h2', '', titleOf(item)), meta, button);
+    refs.hero.append(glow, cover, text);
+    refs.hero.animate([{ opacity: 0 }, { opacity: 1 }], { duration: 400, easing: 'ease-out' });
   }
 
   function makeCard(item) {

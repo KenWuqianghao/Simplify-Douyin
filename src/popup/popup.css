@@ -1,38 +1,40 @@
 :root {
-  --bg: #fff;
-  --raised: #f2f2f2;
-  --surface: #f2f2f2;
-  --surface-hover: #e5e5e5;
-  --line: #e5e5e5;
-  --line-strong: #ccc;
-  --text: #0f0f0f;
-  --muted: #606060;
-  --faint: #909090;
-  --accent: #0f0f0f;
-  --accent-soft: #f2f2f2;
+  --bg: #f2f2f7;
+  --raised: #fff;
+  --surface: rgba(120, 120, 128, 0.12);
+  --surface-hover: rgba(120, 120, 128, 0.2);
+  --line: rgba(60, 60, 67, 0.16);
+  --line-strong: rgba(60, 60, 67, 0.3);
+  --text: #1d1d1f;
+  --muted: rgba(60, 60, 67, 0.62);
+  --faint: rgba(60, 60, 67, 0.36);
+  --accent: #1d1d1f;
+  --accent-soft: rgba(120, 120, 128, 0.12);
   --accent-ink: #fff;
-  --track: #ccc;
-  --ease: cubic-bezier(0.2, 0, 0, 1);
-  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
+  --track: rgba(120, 120, 128, 0.28);
+  --on: #34c759;
+  --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Segoe UI", sans-serif;
   color-scheme: light dark;
   interpolate-size: allow-keywords;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f0f0f;
-    --raised: #272727;
-    --surface: #272727;
-    --surface-hover: #3a3a3a;
-    --line: #303030;
-    --line-strong: #4a4a4a;
-    --text: #f1f1f1;
-    --muted: #aaa;
-    --faint: #717171;
-    --accent: #f1f1f1;
-    --accent-soft: #272727;
-    --accent-ink: #0f0f0f;
-    --track: #4a4a4a;
+    --bg: #000;
+    --raised: #1c1c1e;
+    --surface: rgba(120, 120, 128, 0.24);
+    --surface-hover: rgba(120, 120, 128, 0.38);
+    --line: rgba(84, 84, 88, 0.6);
+    --line-strong: rgba(84, 84, 88, 0.9);
+    --text: #f5f5f7;
+    --muted: rgba(235, 235, 245, 0.6);
+    --faint: rgba(235, 235, 245, 0.3);
+    --accent: #f5f5f7;
+    --accent-soft: rgba(120, 120, 128, 0.24);
+    --accent-ink: #000;
+    --track: rgba(120, 120, 128, 0.32);
+    --on: #30d158;
   }
 }
 
@@ -81,8 +83,9 @@ button {
 
 h1 {
   margin: 0;
-  font-size: 16px;
-  font-weight: 600;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .sub {
@@ -120,9 +123,10 @@ main::-webkit-scrollbar-thumb {
 /* ---------- Today ---------- */
 
 .today {
-  margin: 6px 18px 10px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--line);
+  margin: 4px 14px 10px;
+  padding: 16px 14px 14px;
+  border-radius: 14px;
+  background: var(--raised);
 }
 
 .today-main {
@@ -141,9 +145,10 @@ main::-webkit-scrollbar-thumb {
 }
 
 .metric-num {
-  font-size: 32px;
-  font-weight: 600;
+  font-size: 34px;
+  font-weight: 700;
   line-height: 1;
+  letter-spacing: -0.02em;
   font-variant-numeric: tabular-nums;
 }
 
@@ -211,8 +216,10 @@ main::-webkit-scrollbar-thumb {
 /* ---------- Sections ---------- */
 
 details {
-  margin: 0 18px;
-  border-bottom: 1px solid var(--line);
+  margin: 10px 14px;
+  padding: 0 14px;
+  border-radius: 14px;
+  background: var(--raised);
 }
 
 details:last-of-type {
@@ -371,7 +378,8 @@ details[open]::details-content {
   height: 16px;
   border-radius: 50%;
   background: #fff;
-  transition: transform 0.45s cubic-bezier(0.34, 1.4, 0.5, 1), background-color 0.4s var(--ease), width 0.25s var(--ease);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.22);
+  transition: transform 0.4s var(--ease), width 0.25s var(--ease);
 }
 
 .switch.big > span::after {
@@ -380,12 +388,12 @@ details[open]::details-content {
 }
 
 .switch input:checked + span {
-  background: var(--accent);
+  background: var(--on);
 }
 
 .switch input:checked + span::after {
   transform: translateX(14px);
-  background: var(--accent-ink);
+  background: #fff;
 }
 
 .switch.big input:checked + span::after {
@@ -535,7 +543,6 @@ details[open]::details-content {
   justify-content: space-between;
   gap: 10px;
   padding: 12px 18px 14px;
-  border-top: 1px solid var(--line);
   font-size: 12px;
   color: var(--muted);
 }

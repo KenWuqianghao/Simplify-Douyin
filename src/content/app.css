@@ -1,35 +1,43 @@
 /* Styles for the Calm interface. Loaded inside a shadow root, so nothing here
    touches Douyin's page and nothing on the page reaches in.
 
-   The look is that of an ordinary video site: system font, a normal grid,
-   plain controls. It follows the light or dark setting of the system. */
+   The look follows Apple's interface conventions: the system font, a large
+   title, translucent materials over content, depth from soft shadows, and
+   motion with a spring curve. It follows the light or dark system setting. */
 
 :host {
   all: initial;
   --bg: #fff;
-  --fill: #f2f2f2;        /* fields, chips, placeholders */
-  --fill-hover: #e5e5e5;
-  --line: #e5e5e5;
-  --text: #0f0f0f;
-  --dim: #606060;
-  --sheet: #fff;          /* menus, dialog */
-  --shadow: 0 4px 24px rgba(0, 0, 0, 0.16), 0 0 0 1px rgba(0, 0, 0, 0.06);
-  --ease: cubic-bezier(0.2, 0, 0, 1);
-  --font: -apple-system, BlinkMacSystemFont, "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
+  --fill: rgba(120, 120, 128, 0.12);        /* fields, chips, placeholders */
+  --fill-2: rgba(120, 120, 128, 0.2);
+  --sep: rgba(60, 60, 67, 0.16);
+  --text: #1d1d1f;
+  --dim: rgba(60, 60, 67, 0.62);
+  --material: rgba(255, 255, 255, 0.72);    /* bars over content */
+  --sheet: rgba(248, 248, 250, 0.82);       /* drawer, dialog, toast */
+  --menu: rgba(250, 250, 252, 0.94);
+  --edge-light: rgba(0, 0, 0, 0.06);
+  --shadow: 0 18px 48px rgba(0, 0, 0, 0.18);
+  --blur: saturate(180%) blur(24px);
+  --spring: cubic-bezier(0.32, 0.72, 0, 1);
+  --font: -apple-system, BlinkMacSystemFont, "SF Pro Text", "PingFang SC", "Microsoft YaHei", "Noto Sans SC", "Segoe UI", sans-serif;
   --bar: 56px;
-  --edge: 24px;
+  --edge: 28px;
 }
 
 @media (prefers-color-scheme: dark) {
   :host {
-    --bg: #0f0f0f;
-    --fill: #272727;
-    --fill-hover: #3a3a3a;
-    --line: #303030;
-    --text: #f1f1f1;
-    --dim: #aaa;
-    --sheet: #282828;
-    --shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+    --bg: #000;
+    --fill: rgba(120, 120, 128, 0.24);
+    --fill-2: rgba(120, 120, 128, 0.38);
+    --sep: rgba(84, 84, 88, 0.6);
+    --text: #f5f5f7;
+    --dim: rgba(235, 235, 245, 0.6);
+    --material: rgba(18, 18, 20, 0.72);
+    --sheet: rgba(44, 44, 46, 0.78);
+    --menu: rgba(48, 48, 50, 0.94);
+    --edge-light: rgba(255, 255, 255, 0.1);
+    --shadow: 0 18px 48px rgba(0, 0, 0, 0.6);
   }
 }
 
@@ -61,6 +69,10 @@ button {
   outline-offset: 2px;
 }
 
+[hidden] {
+  display: none !important;
+}
+
 /* ---------- Top bar ---------- */
 
 .bar {
@@ -70,10 +82,18 @@ button {
   z-index: 2147482000;
   display: flex;
   align-items: center;
-  gap: 28px;
+  gap: 24px;
   padding: 0 var(--edge);
-  background: var(--bg);
-  transition: transform 0.25s var(--ease);
+  background: var(--material);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: 0 0.5px 0 transparent;
+  transition: transform 0.45s var(--spring), box-shadow 0.3s;
+}
+
+.root.scrolled .bar,
+.root:not(.home-on) .bar {
+  box-shadow: 0 0.5px 0 var(--sep);
 }
 
 .root.immersive .bar {
@@ -82,39 +102,51 @@ button {
 }
 
 .brand {
-  font-size: 18px;
+  font-size: 19px;
   font-weight: 700;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
+/* A segmented control. The capsule slides to the selected word. */
 .nav {
   position: relative;
   display: flex;
-  gap: 24px;
-  height: 100%;
+  padding: 3px;
+  border-radius: 18px;
+  background: var(--fill);
 }
 
 .nav button {
-  height: 100%;
-  font-size: 15px;
+  position: relative;
+  z-index: 1;
+  height: 30px;
+  padding: 0 16px;
+  border-radius: 15px;
+  font-size: 14px;
   font-weight: 500;
   color: var(--dim);
+  transition: color 0.3s;
 }
 
-.nav button:hover,
+.nav button:hover {
+  color: var(--text);
+}
+
 .nav button.on {
   color: var(--text);
+  font-weight: 600;
 }
 
 .nav .line {
   position: absolute;
   left: 0;
-  bottom: 0;
-  height: 2px;
-  background: var(--text);
-  opacity: 0;
+  top: 3px;
+  height: 30px;
+  border-radius: 15px;
+  background: var(--fill-2);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18), inset 0 0.5px 0 var(--edge-light);
   pointer-events: none;
-  transition: transform 0.25s var(--ease), width 0.25s var(--ease);
+  transition: transform 0.5s var(--spring), width 0.5s var(--spring), opacity 0.2s;
 }
 
 .tools {
@@ -122,32 +154,33 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 8px;
+  gap: 6px;
 }
 
 .search {
   display: flex;
   align-items: center;
-  gap: 8px;
-  width: min(360px, 40vw);
+  gap: 7px;
+  width: min(320px, 36vw);
   height: 36px;
-  margin-right: auto;
-  margin-left: auto;
+  margin: 0 auto;
   padding: 0 12px;
-  border-radius: 18px;
+  border-radius: 10px;
   background: var(--fill);
   color: var(--dim);
   cursor: text;
+  transition: background-color 0.2s, box-shadow 0.2s;
 }
 
 .search:focus-within {
-  outline: 2px solid var(--text);
+  background: var(--fill-2);
+  box-shadow: 0 0 0 3.5px rgba(10, 132, 255, 0.45);
 }
 
 .search svg {
   flex: none;
-  width: 16px;
-  height: 16px;
+  width: 15px;
+  height: 15px;
 }
 
 .search input {
@@ -170,9 +203,9 @@ button {
 
 .count,
 .icon-btn {
-  height: 36px;
-  border-radius: 18px;
-  transition: background-color 0.15s;
+  height: 34px;
+  border-radius: 17px;
+  transition: background-color 0.2s, transform 0.3s var(--spring);
 }
 
 .count {
@@ -193,29 +226,36 @@ button {
   background: var(--fill);
 }
 
+.count:active,
+.icon-btn:active {
+  transform: scale(0.94);
+}
+
 .count.bump b {
   display: inline-block;
-  animation: bump 0.3s var(--ease);
+  animation: bump 0.45s var(--spring);
 }
 
 .icon-btn {
   display: grid;
   place-items: center;
-  width: 36px;
+  width: 34px;
 }
 
 .icon-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
 }
 
 /* ---------- Home ---------- */
 
+/* The page runs under the bar, so the bar's material has content to blur. */
 .home {
   position: fixed;
-  inset: var(--bar) 0 0 0;
+  inset: 0;
   z-index: 2147481000;
   overflow-y: auto;
+  padding-top: var(--bar);
   background: var(--bg);
   visibility: hidden;
 }
@@ -226,50 +266,164 @@ button {
 
 .root.immersive .home {
   visibility: hidden;
-  transition: visibility 0s linear 0.35s;
+  transition: visibility 0s linear 0.4s;
 }
 
 .home::-webkit-scrollbar {
-  width: 8px;
-}
-
-.home::-webkit-scrollbar-thumb {
-  background: var(--fill-hover);
-  border-radius: 4px;
+  width: 0;
 }
 
 .wrap {
-  padding: 0 var(--edge) 64px;
+  max-width: 1680px;
+  margin: 0 auto;
+  padding: 0 var(--edge) 72px;
+}
+
+.head {
+  padding: 22px 0 18px;
+}
+
+.date {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--dim);
+}
+
+.head h1 {
+  margin: 2px 0 0;
+  font-size: 34px;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+/* The first video, large. Its own cover, blurred, colours the panel. */
+.hero {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: center;
+  gap: 36px;
+  margin-bottom: 26px;
+  padding: 30px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #1c1c1e;
+  color: #fff;
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.12);
+}
+
+.hero .glow {
+  position: absolute;
+  z-index: -1;
+  left: -15%;
+  top: -40%;
+  width: 130%;
+  height: 180%;
+  object-fit: cover;
+  filter: blur(70px) saturate(1.7) brightness(0.5);
+}
+
+.hero .cover {
+  flex: none;
+  width: min(46%, 560px);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.08);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5), 0 0 0 0.5px rgba(255, 255, 255, 0.16);
+}
+
+.hero .cover:hover {
+  transform: scale(1.015);
+}
+
+.hero .text {
+  min-width: 0;
+}
+
+.hero h2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.hero .who {
+  display: flex;
+  gap: 12px;
+  margin: 12px 0 22px;
+  font-size: 15px;
+  color: rgba(255, 255, 255, 0.72);
+  font-variant-numeric: tabular-nums;
+}
+
+.play {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  height: 42px;
+  padding: 0 22px 0 18px;
+  border-radius: 21px;
+  background: #fff;
+  color: #000;
+  font-size: 15px;
+  font-weight: 600;
+  transition: transform 0.35s var(--spring), background-color 0.2s;
+}
+
+.play:hover {
+  transform: scale(1.04);
+}
+
+.play:active {
+  transform: scale(0.96);
+}
+
+.play svg {
+  width: 17px;
+  height: 17px;
 }
 
 .topics {
   position: sticky;
-  top: 0;
+  top: var(--bar);
   z-index: 6;
   display: flex;
   gap: 8px;
-  padding: 8px 0 16px;
+  margin: 0 calc(-1 * var(--edge));
+  padding: 10px var(--edge) 14px;
   overflow-x: auto;
-  background: var(--bg);
+  background: var(--material);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
   scrollbar-width: none;
 }
 
 .topics:empty {
-  padding: 4px 0;
+  display: none;
 }
 
 .topic {
   flex: none;
   height: 32px;
-  padding: 0 12px;
-  border-radius: 8px;
+  padding: 0 14px;
+  border-radius: 16px;
   background: var(--fill);
   font-weight: 500;
-  transition: background-color 0.15s;
+  transition: background-color 0.25s, color 0.25s, transform 0.3s var(--spring);
 }
 
 .topic:hover {
-  background: var(--fill-hover);
+  background: var(--fill-2);
+}
+
+.topic:active {
+  transform: scale(0.95);
 }
 
 .topic.on {
@@ -280,8 +434,9 @@ button {
 .grid {
   position: relative;
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 32px 16px;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: 34px 20px;
+  padding-top: 8px;
 }
 
 .card {
@@ -290,24 +445,36 @@ button {
 }
 
 .card.fade {
-  animation: fade 0.2s ease-out both;
+  animation: fade 0.4s ease-out both;
 }
 
 .card.leaving {
   position: absolute;
   pointer-events: none;
-  animation: leave 0.2s ease-out both;
+  animation: leave 0.25s ease-out both;
 }
 
+/* A cover comes forward under the pointer, as a poster does on Apple TV. */
 .cover {
   position: relative;
   display: flex;
   justify-content: center;
   width: 100%;
   aspect-ratio: 16 / 9;
-  border-radius: 10px;
+  border-radius: 14px;
   overflow: hidden;
   background: var(--fill);
+  box-shadow: 0 0 0 0.5px var(--edge-light);
+  transition: transform 0.5s var(--spring), box-shadow 0.5s var(--spring);
+}
+
+.card:hover .cover {
+  transform: scale(1.035);
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.42), 0 0 0 0.5px var(--edge-light);
+}
+
+.card .cover:active {
+  transform: scale(0.985);
 }
 
 .cover img {
@@ -316,13 +483,14 @@ button {
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.35s;
 }
 
 .cover.tall img {
   width: auto;
 }
 
+/* A soft copy of a tall cover fills the sides of its frame. */
 .cover.tall img.soft {
   position: absolute;
   left: -10%;
@@ -331,7 +499,7 @@ button {
   height: 120%;
   max-width: none;
   opacity: 1;
-  filter: blur(20px) brightness(0.6);
+  filter: blur(22px) saturate(1.3) brightness(0.6);
 }
 
 .cover img.ready {
@@ -340,30 +508,33 @@ button {
 
 .length {
   position: absolute;
-  right: 6px;
-  bottom: 6px;
-  padding: 1px 5px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.75);
+  right: 8px;
+  bottom: 8px;
+  padding: 2px 7px;
+  border-radius: 7px;
+  background: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   color: #fff;
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .info {
   display: flex;
-  gap: 12px;
-  margin-top: 12px;
+  gap: 11px;
+  margin-top: 13px;
 }
 
 .avatar {
   flex: none;
-  width: 36px;
-  height: 36px;
+  width: 34px;
+  height: 34px;
   border-radius: 50%;
   background: var(--fill);
   object-fit: cover;
+  box-shadow: 0 0 0 0.5px var(--edge-light);
 }
 
 .text {
@@ -378,12 +549,13 @@ button {
   overflow: hidden;
   font-size: 15px;
   font-weight: 600;
-  line-height: 1.4;
+  line-height: 1.38;
+  letter-spacing: -0.005em;
   cursor: pointer;
 }
 
-.who {
-  margin-top: 4px;
+.card .who {
+  margin-top: 3px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -395,17 +567,17 @@ button {
   flex: none;
   display: grid;
   place-items: center;
-  width: 32px;
-  height: 32px;
-  margin: -4px -8px 0 -4px;
+  width: 30px;
+  height: 30px;
+  margin: -4px -6px 0 -4px;
   border-radius: 50%;
   opacity: 0;
-  transition: background-color 0.15s;
+  transition: background-color 0.2s, opacity 0.2s;
 }
 
 .more svg {
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
 }
 
 .more:hover {
@@ -422,44 +594,47 @@ button {
   z-index: 5;
 }
 
+/* A context menu: a material sheet with hairlines between its rows. */
 .menu {
   position: absolute;
   right: 0;
-  top: calc(100% - 28px);
+  top: calc(100% - 26px);
   z-index: 3;
-  min-width: 200px;
+  min-width: 220px;
   max-width: 300px;
-  padding: 8px 0;
-  border-radius: 12px;
-  background: var(--sheet);
-  box-shadow: var(--shadow);
+  border-radius: 14px;
+  overflow: hidden;
+  background: var(--menu);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow), 0 0 0 0.5px var(--edge-light);
   transform-origin: top right;
-  animation: menu 0.12s ease-out both;
+  animation: menu 0.32s var(--spring) both;
 }
 
 .menu button {
   display: block;
   width: 100%;
-  padding: 9px 16px;
+  padding: 11px 16px;
   text-align: left;
+  font-size: 15px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  box-shadow: 0 0.5px 0 var(--sep);
+}
+
+.menu button:last-child {
+  box-shadow: none;
 }
 
 .menu button:hover,
 .menu button:focus-visible {
-  background: var(--fill-hover);
+  background: var(--fill);
   outline: none;
 }
 
 .menu button span {
-  color: var(--dim);
-}
-
-.menu p {
-  margin: 0;
-  padding: 9px 16px;
   color: var(--dim);
 }
 
@@ -468,7 +643,7 @@ button {
   flex-direction: column;
   align-items: center;
   gap: 12px;
-  padding: 40px 0 0;
+  padding: 44px 0 0;
   color: var(--dim);
 }
 
@@ -481,25 +656,31 @@ button {
   margin: 0;
 }
 
+/* The system activity indicator: eight fading spokes drawn as one gradient. */
 .spinner {
-  width: 24px;
-  height: 24px;
+  width: 26px;
+  height: 26px;
   border-radius: 50%;
-  border: 2.5px solid var(--fill-hover);
-  border-top-color: var(--dim);
-  animation: spin 0.8s linear infinite;
+  background: conic-gradient(from 0deg, transparent 0 8%, var(--dim) 100%);
+  -webkit-mask: repeating-conic-gradient(#000 0 14deg, transparent 14deg 45deg), radial-gradient(circle, transparent 0 42%, #000 44%);
+  -webkit-mask-composite: source-in;
+  animation: spin 0.9s steps(8) infinite;
+}
+
+.ghost .cover {
+  box-shadow: none;
 }
 
 .ghost .cover,
 .bone {
-  animation: pulse 1.4s ease-in-out infinite;
+  background: linear-gradient(100deg, var(--fill) 40%, var(--fill-2) 50%, var(--fill) 60%) 0 0 / 300% 100%;
+  animation: sheen 1.6s linear infinite;
 }
 
 .bone {
-  height: 16px;
-  margin: 12px 48px 0 0;
-  border-radius: 4px;
-  background: var(--fill);
+  height: 15px;
+  margin: 13px 48px 0 0;
+  border-radius: 5px;
 }
 
 .bone.short {
@@ -509,10 +690,15 @@ button {
 .text-btn,
 .primary {
   height: 36px;
-  padding: 0 16px;
+  padding: 0 18px;
   border-radius: 18px;
-  font-weight: 500;
-  transition: background-color 0.15s, opacity 0.15s;
+  font-weight: 600;
+  transition: background-color 0.2s, opacity 0.2s, transform 0.3s var(--spring);
+}
+
+.text-btn:active,
+.primary:active {
+  transform: scale(0.96);
 }
 
 .text-btn {
@@ -521,7 +707,7 @@ button {
 }
 
 .text-btn:hover {
-  background: var(--fill-hover);
+  background: var(--fill-2);
 }
 
 .primary {
@@ -530,7 +716,7 @@ button {
 }
 
 .primary:hover {
-  opacity: 0.9;
+  opacity: 0.88;
 }
 
 /* ---------- Page change and empty page ---------- */
@@ -542,12 +728,12 @@ button {
   background: #000;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.25s;
+  transition: opacity 0.35s;
 }
 
 .veil.on {
   opacity: 1;
-  transition-duration: 0.1s;
+  transition-duration: 0.12s;
 }
 
 .root.immersive .veil {
@@ -562,9 +748,9 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 16px;
+  gap: 18px;
   padding: 0 24px 8vh;
-  color: #f1f1f1;
+  color: #f5f5f7;
   text-align: center;
 }
 
@@ -574,17 +760,19 @@ button {
 
 .empty p {
   margin: 0;
-  font-size: 16px;
+  font-size: 20px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .empty .btns {
   display: flex;
-  gap: 8px;
+  gap: 10px;
 }
 
 .empty .text-btn {
-  background: #272727;
-  color: #f1f1f1;
+  background: rgba(120, 120, 128, 0.32);
+  color: #f5f5f7;
 }
 
 /* The cover that grows into the player. */
@@ -606,30 +794,38 @@ button {
 
 .panel {
   position: fixed;
-  top: var(--bar);
-  right: 0;
-  bottom: 0;
+  top: calc(var(--bar) + 10px);
+  right: 10px;
+  bottom: 10px;
   z-index: 2147482500;
-  width: min(360px, 100vw);
+  width: min(370px, calc(100vw - 20px));
   overflow-y: auto;
-  padding: 16px 24px 32px;
-  background: var(--bg);
-  border-left: 1px solid var(--line);
-  transform: translateX(100%);
+  padding: 20px 22px 28px;
+  border-radius: 22px;
+  background: var(--sheet);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow), 0 0 0 0.5px var(--edge-light);
+  transform: translateX(calc(100% + 24px));
   visibility: hidden;
-  transition: transform 0.25s var(--ease), visibility 0s linear 0.25s;
+  transition: transform 0.55s var(--spring), visibility 0s linear 0.55s;
 }
 
 .panel.open {
   transform: none;
   visibility: visible;
-  transition: transform 0.25s var(--ease), visibility 0s;
+  transition: transform 0.55s var(--spring), visibility 0s;
+}
+
+.panel::-webkit-scrollbar {
+  width: 0;
 }
 
 .panel h2 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
 }
 
 .panel .lead {
@@ -649,19 +845,26 @@ button {
   position: relative;
   display: flex;
   justify-content: space-between;
-  margin-bottom: 4px;
-  padding: 7px 10px;
-  border-radius: 6px;
+  margin-bottom: 5px;
+  padding: 8px 12px;
+  border-radius: 9px;
   overflow: hidden;
+  font-size: 15px;
 }
 
 .tally li::before {
   content: "";
   position: absolute;
   inset: 0;
+  border-radius: 9px;
   background: var(--fill);
-  transform: scaleX(var(--share));
+  transform: scaleX(0);
   transform-origin: left;
+}
+
+.panel.open .tally li::before {
+  transform: scaleX(var(--share));
+  transition: transform 0.8s var(--spring) calc(0.15s + var(--i) * 45ms);
 }
 
 .tally li > * {
@@ -669,19 +872,20 @@ button {
 }
 
 .tally b {
-  font-weight: 500;
+  font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 
 .panel h3 {
-  margin: 24px 0 4px;
-  font-size: 14px;
+  margin: 24px 0 2px;
+  font-size: 13px;
   font-weight: 600;
+  color: var(--dim);
 }
 
 .panel .item {
-  padding: 10px 0;
-  border-bottom: 1px solid var(--line);
+  padding: 11px 0;
+  box-shadow: 0 0.5px 0 var(--sep);
 }
 
 .panel .desc {
@@ -689,11 +893,11 @@ button {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  font-size: 13px;
+  font-size: 14px;
 }
 
 .panel .why {
-  margin-top: 2px;
+  margin-top: 3px;
   font-size: 12px;
   color: var(--dim);
 }
@@ -714,7 +918,7 @@ button {
 }
 
 .root.player-on:not(.immersive) .player-tools {
-  top: calc(var(--bar) + 12px);
+  top: calc(var(--bar) + 14px);
 }
 
 .over {
@@ -722,25 +926,28 @@ button {
   align-items: center;
   gap: 6px;
   height: 36px;
-  padding: 0 14px 0 10px;
+  padding: 0 15px 0 11px;
   border-radius: 18px;
-  background: rgba(0, 0, 0, 0.5);
+  background: rgba(60, 60, 64, 0.5);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: inset 0 0 0 0.5px rgba(255, 255, 255, 0.16);
   color: #fff;
-  font-weight: 500;
-  transition: background-color 0.15s;
+  font-weight: 600;
+  transition: background-color 0.2s, transform 0.3s var(--spring);
 }
 
 .over:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(90, 90, 96, 0.6);
 }
 
-.over[hidden] {
-  display: none;
+.over:active {
+  transform: scale(0.95);
 }
 
 .over svg {
-  width: 18px;
-  height: 18px;
+  width: 17px;
+  height: 17px;
 }
 
 .player-tools .menu {
@@ -750,7 +957,7 @@ button {
   transform-origin: top left;
 }
 
-.root:not(.immersive) .back {
+.root:not(.immersive) .over.back {
   display: none;
 }
 
@@ -758,24 +965,30 @@ button {
 
 .toast {
   position: fixed;
-  left: 24px;
-  bottom: 24px;
+  left: 50%;
+  top: calc(var(--bar) + 14px);
   z-index: 2147483001;
   max-width: min(480px, 90vw);
-  padding: 12px 16px;
-  border-radius: 8px;
-  background: #282828;
-  color: #f1f1f1;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+  padding: 11px 20px;
+  border-radius: 22px;
+  background: var(--sheet);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow), 0 0 0 0.5px var(--edge-light);
+  font-weight: 600;
   opacity: 0;
-  transform: translateY(8px);
+  transform: translate(-50%, -18px) scale(0.92);
   pointer-events: none;
-  transition: opacity 0.15s, transform 0.15s var(--ease);
+  transition: opacity 0.25s, transform 0.5s var(--spring);
+}
+
+.root.immersive .toast {
+  top: 16px;
 }
 
 .toast.show {
   opacity: 1;
-  transform: none;
+  transform: translate(-50%, 0);
 }
 
 /* ---------- Break reminder ---------- */
@@ -786,9 +999,11 @@ button {
   z-index: 2147483002;
   display: grid;
   place-items: center;
-  background: rgba(0, 0, 0, 0.7);
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
   opacity: 0;
-  transition: opacity 0.2s;
+  transition: opacity 0.3s;
 }
 
 .pause.show {
@@ -796,13 +1011,16 @@ button {
 }
 
 .pause .sheet {
-  width: min(400px, 90vw);
-  padding: 24px;
-  border-radius: 16px;
+  width: min(360px, 90vw);
+  padding: 26px 24px 20px;
+  border-radius: 22px;
   background: var(--sheet);
-  box-shadow: var(--shadow);
-  transform: scale(0.96);
-  transition: transform 0.2s var(--ease);
+  backdrop-filter: var(--blur);
+  -webkit-backdrop-filter: var(--blur);
+  box-shadow: var(--shadow), 0 0 0 0.5px var(--edge-light);
+  text-align: center;
+  transform: scale(1.08);
+  transition: transform 0.45s var(--spring);
 }
 
 .pause.show .sheet {
@@ -810,46 +1028,52 @@ button {
 }
 
 .pause h2 {
-  margin: 0 0 8px;
-  font-size: 18px;
-  font-weight: 600;
+  margin: 0 0 6px;
+  font-size: 19px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .pause p {
-  margin: 0 0 24px;
+  margin: 0 0 22px;
   color: var(--dim);
 }
 
 .pause .btns {
   display: flex;
-  justify-content: flex-end;
-  gap: 8px;
+  gap: 10px;
+}
+
+.pause .btns button {
+  flex: 1;
+  height: 42px;
+  border-radius: 21px;
 }
 
 /* ---------- Motion ---------- */
 
 @keyframes fade {
-  from { opacity: 0; }
+  from { opacity: 0; transform: scale(0.98); }
 }
 
 @keyframes leave {
-  to { opacity: 0; transform: scale(0.96); }
+  to { opacity: 0; transform: scale(0.94); }
 }
 
 @keyframes menu {
-  from { opacity: 0; transform: scale(0.96); }
+  from { opacity: 0; transform: scale(0.6); }
 }
 
 @keyframes bump {
-  50% { transform: scale(1.25); }
+  40% { transform: scale(1.3); }
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
 
-@keyframes pulse {
-  50% { opacity: 0.5; }
+@keyframes sheen {
+  to { background-position: -300% 0; }
 }
 
 @media (max-width: 800px) {
@@ -857,11 +1081,14 @@ button {
     --edge: 16px;
   }
 
-  .bar { gap: 16px; }
-  .nav { gap: 16px; }
+  .bar { gap: 12px; }
+  .nav button { padding: 0 11px; }
   .search { width: 36px; padding: 0 10px; }
-  .search:focus-within { position: absolute; left: 16px; right: 16px; width: auto; z-index: 1; }
+  .search:focus-within { position: absolute; left: 16px; right: 16px; width: auto; z-index: 2; }
   .count { display: none; }
+  .hero { flex-direction: column; align-items: stretch; gap: 20px; padding: 18px; }
+  .hero .cover { width: 100%; }
+  .hero h2 { font-size: 22px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -870,5 +1097,6 @@ button {
   *::after {
     animation-duration: 1ms !important;
     transition-duration: 1ms !important;
+    transition-delay: 0ms !important;
   }
 }
