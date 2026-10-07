@@ -389,9 +389,11 @@ button {
   height: 17px;
 }
 
+/* top: 0 is the edge of the scroll area below its padding, so the row stops
+   directly under the bar. */
 .topics {
   position: sticky;
-  top: var(--bar);
+  top: 0;
   z-index: 6;
   display: flex;
   gap: 8px;
